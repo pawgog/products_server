@@ -11,8 +11,8 @@ router.get('/', async (req, res) => {
     }
 })
 
-router.get('/:id', async (req, res) => {
-    res.send(req.params.id)
+router.get('/:id', getProducts, (req, res) => {
+    res.send(res.product)
 })
 
 router.post('/:id', async (req, res) => {
@@ -30,12 +30,32 @@ router.post('/:id', async (req, res) => {
     }
 })
 
-router.put('/:id', async (req, res) => {
-    res.send(req.params.id)
+router.patch('/:id', getProducts, (req, res) => {
+
 })
 
-router.delete('/:id', async (req, res) => {
-    res.send(req.params.id)
+router.delete('/:id', getProducts, async (req, res) => {
+    try {
+        await res.product.remove()
+        res.json({ message: 'Product deleted' })
+    } catch (error) {
+        res.status(500).json({ message: error.message })
+    }
 })
+
+async function getProducts(req, res, next) {
+    let product;
+    try {
+        product = await Products.findById(req.params.id);
+        if (product === null) {
+            return res.status(404).json({ message: 'Can not find product' })
+        }
+    } catch (error) {
+        return res.status(500).json({ message: error.message })
+    }
+
+    res.product = product
+    next()
+}
 
 module.exports = router;
