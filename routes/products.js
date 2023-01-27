@@ -17,8 +17,9 @@ router.get('/:id', getProducts, (req, res) => {
 
 router.post('/:id', async (req, res) => {
     const product = new Products({
-        name: req.body.name,
-        price: req.body.price,
+        title: req.body.title,
+        prices: req.body.prices,
+        url: req.body.url,
         imgUrl: req.body.imgUrl
     });
 
@@ -31,11 +32,14 @@ router.post('/:id', async (req, res) => {
 })
 
 router.patch('/:id', getProducts, async (req, res) => {
-    if(req.body.name !== null) {
-        res.product.name = req.body.name;
+    if(req.body.title !== null) {
+        res.product.title = req.body.title;
     }
-    if(req.body.price !== null) {
-        res.product.price = req.body.price;
+    if(req.body.prices !== null) {
+        res.product.prices = req.body.prices;
+    }
+    if(req.body.url !== null) {
+        res.product.url = req.body.url;
     }
     if(req.body.imgUrl !== null) {
         res.product.imgUrl = req.body.imgUrl;
