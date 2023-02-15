@@ -20,7 +20,7 @@ router.post('/:id', async (req, res) => {
         title: req.body.title,
         prices: req.body.prices,
         url: req.body.url,
-        imgUrl: req.body.imgUrl
+        imageUrl: req.body.imageUrl
     });
 
     try {
@@ -41,8 +41,8 @@ router.patch('/:id', getProducts, async (req, res) => {
     if(req.body.url !== null) {
         res.product.url = req.body.url;
     }
-    if(req.body.imgUrl !== null) {
-        res.product.imgUrl = req.body.imgUrl;
+    if(req.body.imageUrl !== null) {
+        res.product.imageUrl = req.body.imageUrl;
     }
     try {
         const updateProduct = await res.product.save();
