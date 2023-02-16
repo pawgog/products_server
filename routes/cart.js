@@ -17,25 +17,37 @@ router.get('/:id', (req, res) => {
 
 router.post('/:id', async (req, res) => {
     try {
-        let cart = await Cart.findOne({ productId: req.body.productId });
+        let cart = await Cart.findOne({ "cart.productId": req.body.productId });
 
         if (cart) {
-            cart.quantity = cart.quantity + 1;
+            const { prices } = cart.cart.find((product) => (product.productId === req.body.productId))
+            cart.pricesSum.map((product) => prices.find((price) => { 
+                if(price.currency === product.currency) return product.amount = product.amount + price.amount 
+            }))
+            cart.cart.map((product) => {
+                if(product.productId === req.body.productId) return product.quantity = product.quantity + 1;
+                return product;
+            });
+
             cart = await cart.save();
             return res.status(201).send(cart);
         } else {
             const productCart = new Cart({
-                productId: req.body.productId,
-                title: req.body.title,
-                prices: req.body.prices,
-                url: req.body.url,
-                imageUrl: req.body.imageUrl,
-                quantity: 1,
+                cart: [{
+                    productId: req.body.productId,
+                    title: req.body.title,
+                    prices: req.body.prices,
+                    url: req.body.url,
+                    imageUrl: req.body.imageUrl,
+                    quantity: 1,
+                }],
+                pricesSum: req.body.prices
             });
 
             const newProductCart = await productCart.save();
             return res.status(201).json(newProductCart);
         }
+
     } catch (error) {
         res.status(400).json({ message: error.message });
     }
