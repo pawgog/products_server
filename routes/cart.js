@@ -17,20 +17,36 @@ router.get('/:id', (req, res) => {
 
 router.post('/:id', async (req, res) => {
     try {
+        const existCart = await Cart.findOne();
         let cart = await Cart.findOne({ "cart.productId": req.body.productId });
 
-        if (cart) {
-            const { prices } = cart.cart.find((product) => (product.productId === req.body.productId))
-            cart.pricesSum.map((product) => prices.find((price) => { 
-                if(price.currency === product.currency) return product.amount = product.amount + price.amount 
-            }))
-            cart.cart.map((product) => {
-                if(product.productId === req.body.productId) return product.quantity = product.quantity + 1;
-                return product;
-            });
+        if (existCart) {
+            if (cart) {
+                const { prices } = cart.cart.find((product) => (product.productId === req.body.productId))
+                cart.pricesSum.map((product) => prices.find((price) => { 
+                    if(price.currency === product.currency) return product.amount = product.amount + price.amount 
+                }))
+                cart.cart.map((product) => {
+                    if(product.productId === req.body.productId) return product.quantity = product.quantity + 1;
+                    return product;
+                });
+    
+                cart = await cart.save();
+                return res.status(201).send(cart);
+            } else {
+                const cartArray = {
+                    productId: req.body.productId,
+                    title: req.body.title,
+                    prices: req.body.prices,
+                    url: req.body.url,
+                    imageUrl: req.body.imageUrl,
+                    quantity: 1,
+                }
+                existCart.cart.push(cartArray);
 
-            cart = await cart.save();
-            return res.status(201).send(cart);
+                const updateProductCart = await existCart.save();
+                return res.status(201).json(updateProductCart);
+            }
         } else {
             const productCart = new Cart({
                 cart: [{
