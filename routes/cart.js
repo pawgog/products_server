@@ -30,10 +30,14 @@ router.post('/:id', async (req, res) => {
                     if(product.productId === req.body.productId) return product.quantity = product.quantity + 1;
                     return product;
                 });
-    
+
+                cart.markModified('pricesSum');
                 cart = await cart.save();
                 return res.status(201).send(cart);
             } else {
+                existCart.pricesSum.map((product) => req.body.prices.find((price) => { 
+                    if(price.currency === product.currency) return product.amount = product.amount + price.amount 
+                }))
                 const cartArray = {
                     productId: req.body.productId,
                     title: req.body.title,
@@ -44,6 +48,7 @@ router.post('/:id', async (req, res) => {
                 }
                 existCart.cart.push(cartArray);
 
+                existCart.markModified('pricesSum');
                 const updateProductCart = await existCart.save();
                 return res.status(201).json(updateProductCart);
             }
