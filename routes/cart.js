@@ -13,8 +13,8 @@ const cartArray = (productId, title, prices, url, imageUrl) => ({
 
 const calculatePrices = (cart, productId) => {
     const { prices } = cart.cart.find((product) => (product.productId === productId))
-    return cart.pricesSum.map((product) => prices.find((price) => { 
-        if(price.currency === product.currency) return product.amount = product.amount + price.amount 
+    return cart.pricesSum.map((product) => prices.find((price) => {
+        if (price.currency === product.currency) return product.amount = product.amount + price.amount
     }))
 }
 
@@ -41,7 +41,7 @@ router.post('/:id', async (req, res) => {
             if (cart) {
                 calculatePrices(cart, productId);
                 cart.cart.map((product) => {
-                    if(product.productId === productId) return product.quantity = product.quantity + 1;
+                    if (product.productId === productId) return product.quantity = product.quantity + 1;
                     return product;
                 });
 
@@ -66,6 +66,18 @@ router.post('/:id', async (req, res) => {
             return res.status(201).json(newProductCart);
         }
 
+    } catch (error) {
+        res.status(400).json({ message: error.message });
+    }
+});
+
+router.delete('/:id', async (req, res) => {
+    const { id } = req.params
+    try {
+        const existCart = await Cart.findOne();
+        const filtered = existCart.cart.filter((item) => item.productId !== Number(id));
+        existCart.cart = filtered;
+        // return res.status(201).send(cart);
     } catch (error) {
         res.status(400).json({ message: error.message });
     }
