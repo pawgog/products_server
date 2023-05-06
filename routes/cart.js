@@ -92,6 +92,9 @@ router.delete('/:id', async (req, res) => {
         existCart.cart = filtered;
         calculatePrices(existCart)
 
+        existCart.markModified('pricesSum');
+        const deleteProductCart = await existCart.save();
+        return res.status(201).json(deleteProductCart);
     } catch (error) {
         res.status(400).json({ message: error.message });
     }
