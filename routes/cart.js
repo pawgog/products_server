@@ -11,11 +11,24 @@ const cartArray = (productId, title, prices, url, imageUrl) => ({
     quantity: 1,
 });
 
-const calculatePrices = (cart, productId) => {
-    const { prices } = cart.cart.find((product) => (product.productId === productId))
-    return cart.pricesSum.map((product) => prices.find((price) => {
-        if (price.currency === product.currency) return product.amount = product.amount + price.amount
-    }))
+const calculatePrices = (cartPrices) => {
+    const calcObject = {};
+    cartPrices.cart.map(obj => obj.prices.forEach((item) => {
+        if (!calcObject[item.currency]) {
+            calcObject[item.currency] = item.amount * obj.quantity;
+        } else {
+            calcObject[item.currency] = Number(calcObject[item.currency]) + Number(item.amount * obj.quantity);
+        }
+    }));
+    const newSumArray = [];
+    for (let key in calcObject) {
+        newSumArray.push({
+            amount: Number(calcObject[key].toFixed(2)),
+            currency: key
+        })
+    }
+    cartPrices.pricesSum = newSumArray;
+    return cartPrices;
 }
 
 router.get('/', async (req, res) => {
@@ -77,7 +90,8 @@ router.delete('/:id', async (req, res) => {
         const existCart = await Cart.findOne();
         const filtered = existCart.cart.filter((item) => item.productId !== Number(id));
         existCart.cart = filtered;
-        // return res.status(201).send(cart);
+        calculatePrices(existCart)
+
     } catch (error) {
         res.status(400).json({ message: error.message });
     }
