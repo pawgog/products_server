@@ -48,27 +48,14 @@ router.post('/:id', async (req, res) => {
     const { productId, prices, title, url, imageUrl } = req.body;
     try {
         const existCart = await Cart.findOne();
-        let cart = await Cart.findOne({ "cart.productId": productId });
 
         if (existCart) {
-            if (cart) {
-                calculatePrices(cart, productId);
-                cart.cart.map((product) => {
-                    if (product.productId === productId) return product.quantity = product.quantity + 1;
-                    return product;
-                });
+            existCart.cart.push(cartArray(productId, title, prices, url, imageUrl));
+            calculatePrices(existCart, productId);
 
-                cart.markModified('pricesSum');
-                cart = await cart.save();
-                return res.status(201).send(cart);
-            } else {
-                existCart.cart.push(cartArray(productId, title, prices, url, imageUrl));
-                calculatePrices(existCart, productId);
-
-                existCart.markModified('pricesSum');
-                const updateProductCart = await existCart.save();
-                return res.status(201).json(updateProductCart);
-            }
+            existCart.markModified('pricesSum');
+            const updateProductCart = await existCart.save();
+            return res.status(201).json(updateProductCart);
         } else {
             const productCart = new Cart({
                 cart: [cartArray(productId, title, prices, url, imageUrl)],
@@ -79,6 +66,25 @@ router.post('/:id', async (req, res) => {
             return res.status(201).json(newProductCart);
         }
 
+    } catch (error) {
+        res.status(400).json({ message: error.message });
+    }
+});
+
+router.put('/:id', async (req, res) => {
+    const { id } = req.params;
+    try {
+        let cart = await Cart.findOne({ "cart.productId": id });
+
+        cart.cart.map((product) => {
+            if (product.productId === Number(id)) return product.quantity = product.quantity + 1;
+            return product;
+        });
+        calculatePrices(cart)
+
+        cart.markModified('pricesSum');
+        cart = await cart.save();
+        return res.status(201).send(cart);
     } catch (error) {
         res.status(400).json({ message: error.message });
     }
