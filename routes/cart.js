@@ -91,7 +91,7 @@ router.put('/:id', async (req, res) => {
 });
 
 router.delete('/:id', async (req, res) => {
-    const { id } = req.params
+    const { id } = req.body
     try {
         const existCart = await Cart.findOne();
         const filtered = existCart.cart.filter((item) => item.productId !== Number(id));
