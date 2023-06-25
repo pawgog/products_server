@@ -74,7 +74,7 @@ router.post('/:id', async (req, res) => {
 router.put('/:id', async (req, res) => {
     const { id, quantity } = req.body;
     try {
-        let cart = await Cart.findOne({ "cart.productId": id });
+        const cart = await Cart.findOne({ "cart.productId": id });
 
         cart.cart.map((product) => {
             if (product.productId === Number(id)) return product.quantity = quantity;
