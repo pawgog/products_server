@@ -6,7 +6,7 @@ const port = process.env.PORT || 3210;
 
 require('dotenv').config();
 
-mongoose.connect(`${process.env.DB_URL}/webshop`);
+mongoose.connect(`mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.pcdox.mongodb.net/webshop`);
 
 const db = mongoose.connection;
 db.on('error', (error) => console.error(error));
